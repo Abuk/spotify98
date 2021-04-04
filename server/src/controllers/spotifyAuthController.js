@@ -5,7 +5,8 @@ const FormData = require("form-data");
 const c_id = process.env.CLIENT_ID;
 const c_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
-const scopes = "user-read-private user-read-email user-library-read";
+const scopes =
+  "streaming user-read-currently-playing user-read-playback-state user-read-private user-read-email user-library-read";
 const stateKey = "spotify_auth_state";
 
 const generateState = (length) => {
@@ -17,6 +18,12 @@ const generateState = (length) => {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
+};
+
+const formDataBuilder = (data) => {
+  var formData = new URLSearchParams();
+  Object.keys(data).forEach((key) => formData.append(key, data[key]));
+  return formData;
 };
 
 const login = (res) => {
@@ -54,11 +61,7 @@ const callback = (req, res) => {
       code: code,
       redirect_uri: redirect_uri,
     };
-    const formData = new URLSearchParams();
-
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
-    });
+    var formData = formDataBuilder(data);
 
     var authOptions = {
       headers: {
@@ -72,19 +75,10 @@ const callback = (req, res) => {
     axios
       .post(authUrl, formData.toString(), authOptions)
       .then((response) => {
-        console.log(response.status);
-        console.log(response);
+        console.log("Spotify API Responded with status:" + response.status);
         if (response.status == 200) {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
-          const meUrl = "https://api.spotify.com/v1/me";
-          const options = {
-            headers: { Authorization: "Bearer " + access_token },
-          };
-
-          axios.get(meUrl, options).then((res) => {
-            console.log(res.data);
-          });
 
           res.redirect(
             "/#" +
@@ -107,7 +101,41 @@ const callback = (req, res) => {
   }
 };
 
+const refreshToken = (req, res) => {
+  const refresh_token = req.query.refresh_token;
+  const refreshUrl = "https://accounts.spotify.com/api/token";
+  const data = {
+    grant_type: "refresh_token",
+    refresh_token: refresh_token,
+  };
+  const formData = formDataBuilder(data);
+  const options = {
+    headers: {
+      Authorization:
+        "Basic " + Buffer.from(c_id + ":" + c_secret).toString("base64"),
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "Content-Length": formData.length,
+    },
+  };
+
+  axios
+    .post(refreshUrl, formData.toString(), options)
+    .then((response) => {
+      if (response.status === 200) {
+        const access_token = data.access_token;
+        console.log(response.data);
+        res.send({
+          access_token: access_token,
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 module.exports = {
   login: login,
   callback: callback,
+  refreshToken: refreshToken,
 };
