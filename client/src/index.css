@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "Levi Windows";
+  src: local("LeviWindows"), url(./fonts/LeviWindows.ttf) format("truetype");
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
