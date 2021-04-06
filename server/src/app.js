@@ -13,7 +13,7 @@ if (env_load.error) {
   throw env_load.error;
 }
 
-app.use(express.static(__dirname + "/public"));
+//app.use(express.static(__dirname + "/public"));
 app.use(cookieParser());
 app.use("/api", routes);
 app.use(cors());

@@ -80,13 +80,9 @@ const callback = (req, res) => {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
 
-          res.redirect(
-            "/#" +
-              querystring.stringify({
-                access_token: access_token,
-                refresh_token: refresh_token,
-              })
-          );
+          res.cookie("access_token", access_token);
+          res.cookie("refresh_token", refresh_token);
+          res.redirect("http://localhost:3000/");
         }
       })
       .catch((error) => {
