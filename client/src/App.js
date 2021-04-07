@@ -1,17 +1,37 @@
-import { useEffect, useState } from "react";
-import Player from "./components/Player";
-import Login from "./components/Login";
-import { getLoginState } from "./tools/login";
+import { useEffect, useState, useCallback } from "react";
+import Player from "./components/player/Player";
+import Login from "./components/login/Login";
+import { getLoginState, logout } from "./components/login/loginHelper";
 
 function App() {
   const [userLoginState, setUserLoginState] = useState(false);
+  const handleUserLoginState = useCallback((state) => {
+    setUserLoginState(state);
+  }, []);
 
   useEffect(() => {
-    setUserLoginState(getLoginState());
+    console.log(userLoginState);
   }, [userLoginState]);
 
-  if (getLoginState()) return <Player></Player>;
-  else return <Login></Login>;
+  useEffect(() => {
+    if (getLoginState()) handleUserLoginState(true);
+  }, []);
+
+  if (getLoginState()) {
+    return (
+      <div>
+        <Player></Player>
+        <button
+          onClick={() => {
+            handleUserLoginState(false);
+            logout();
+          }}
+        >
+          logout
+        </button>
+      </div>
+    );
+  } else return <Login></Login>;
 }
 
 export default App;
