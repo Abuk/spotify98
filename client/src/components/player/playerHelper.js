@@ -25,21 +25,30 @@ export const loadPlayer = () => {
 };
 
 export const playSong = ({
-  deviceId: deviceId,
-  contextId: contextId,
-  mediaId: mediaId,
-  volume: volume,
-  timeOffset: timeOffset,
+  deviceId,
+  contextId,
+  mediaId,
+  volume,
+  timeOffset,
 }) => {
   if (typeof mediaId === String) {
     mediaId = [mediaId];
   }
-  const data = {
-    context_uri: contextId,
-    uris: mediaId,
-    volume: volume,
-    position_ms: timeOffset,
-  };
+  let data;
+  if (contextId != null) {
+    data = {
+      context_uri: contextId,
+      uris: mediaId,
+      volume: volume,
+      position_ms: timeOffset,
+    };
+  } else {
+    data = {
+      uris: mediaId,
+      volume: volume,
+      position_ms: timeOffset,
+    };
+  }
   axios
     .put(
       `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
@@ -58,7 +67,7 @@ export const playSong = ({
   return true;
 };
 
-export const play = (deviceId) => {
+export const play = () => {
   axios
     .put(
       `https://api.spotify.com/v1/me/player/play`,
@@ -81,7 +90,7 @@ export const play = (deviceId) => {
   return true;
 };
 
-export const pause = (deviceId) => {
+export const pause = () => {
   axios
     .put(
       `https://api.spotify.com/v1/me/player/pause`,

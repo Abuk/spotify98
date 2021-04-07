@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
-import React, { useEffect, useState, useCallback } from "react";
-import { loadPlayer, playSong, play, pause } from "./playerHelper";
+import React, { useEffect, useState } from "react";
+import { loadPlayer, play, pause } from "./playerHelper";
 
 const Player = () => {
   const [playbackState, setPlaybackState] = useState([]);
@@ -18,7 +18,9 @@ const Player = () => {
   useEffect(() => {
     console.log("state deviceid changed: " + deviceId);
   }, [deviceId, playbackState]);
+
   useEffect(() => {
+    let isMounted = true;
     loadPlayer().then(() => {
       window.onSpotifyWebPlaybackSDKReady = () => {
         const token = Cookies.get("access_token");
@@ -51,9 +53,9 @@ const Player = () => {
         });
 
         // Ready
-        player.addListener("ready", ({ device_id }, setDeviceId) => {
+        player.addListener("ready", ({ device_id }) => {
           console.log("Ready with Device ID", device_id);
-          handleDeviceId(device_id);
+          if (isMounted) handleDeviceId(device_id);
         });
 
         // Not Ready
@@ -63,13 +65,16 @@ const Player = () => {
         console.log(player.connect());
       };
     });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
     <div>
       player pls
-      <button onClick={() => play(deviceId)}>play</button>
-      <button onClick={() => pause(deviceId)}>pause</button>
+      <button onClick={() => play()}>play</button>
+      <button onClick={() => pause()}>pause</button>
     </div>
   );
 };

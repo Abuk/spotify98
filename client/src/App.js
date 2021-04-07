@@ -15,7 +15,7 @@ function App() {
 
   useEffect(() => {
     if (getLoginState()) handleUserLoginState(true);
-  }, []);
+  }, [handleUserLoginState]);
 
   if (getLoginState()) {
     return (
@@ -23,6 +23,7 @@ function App() {
         <Player></Player>
         <button
           onClick={() => {
+            setTimeout(200);
             handleUserLoginState(false);
             logout();
           }}

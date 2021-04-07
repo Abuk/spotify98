@@ -1,6 +1,5 @@
 import Cookies from "js-cookie";
 import axios from "axios";
-import { handleUserLoginState } from "../../App";
 
 export const getLoginState = () => {
   if (typeof Cookies.get("access_token") === "undefined") {
