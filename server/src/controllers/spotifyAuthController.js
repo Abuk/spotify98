@@ -6,7 +6,7 @@ const c_id = process.env.CLIENT_ID;
 const c_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 const scopes =
-  "streaming user-read-currently-playing user-read-playback-state user-read-private user-read-email user-library-read";
+  "streaming user-modify-playback-state user-read-currently-playing user-read-playback-state user-read-private user-read-email user-library-read";
 const stateKey = "spotify_auth_state";
 
 const generateState = (length) => {
@@ -80,7 +80,9 @@ const callback = (req, res) => {
           const access_token = response.data.access_token;
           const refresh_token = response.data.refresh_token;
 
-          res.cookie("access_token", access_token);
+          res.cookie("access_token", access_token, {
+            expires: new Date(Date.now() + 60 * 60 * 1000),
+          });
           res.cookie("refresh_token", refresh_token);
           res.redirect("http://localhost:3000/");
         }
@@ -120,13 +122,15 @@ const refreshToken = (req, res) => {
       if (response.status === 200) {
         const access_token = data.access_token;
         console.log(response.data);
-        res.send({
-          access_token: access_token,
+        res.cookie("access_token", access_token, {
+          expires: new Date(Date.now() + 60 * 60 * 1000),
         });
+        res.status(200);
       }
     })
     .catch((error) => {
       console.log(error);
+      res.status(401);
     });
 };
 
