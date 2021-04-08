@@ -6,7 +6,7 @@ const c_id = process.env.CLIENT_ID;
 const c_secret = process.env.CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 const scopes =
-  "streaming user-modify-playback-state user-read-currently-playing user-read-playback-state user-read-private user-read-email user-library-read";
+  "streaming user-modify-playback-state user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private user-read-email user-library-read";
 const stateKey = "spotify_auth_state";
 
 const generateState = (length) => {
