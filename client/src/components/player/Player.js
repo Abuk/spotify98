@@ -159,9 +159,9 @@ const Player = () => {
           src={playbackState.item.album.images[0].url}
           alt={playbackState.item.album.name}
           trackName={playbackState.item.name}
-          authors={_.compact(
-            _.map(playbackState.item.album.artists, "name")
-          ).join(",")}
+          authors={_.compact(_.map(playbackState.item.artists, "name")).join(
+            ", "
+          )}
         ></AlbumArt>
         <button
           onClick={() => {
