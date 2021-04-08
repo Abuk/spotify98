@@ -19,7 +19,7 @@ function App() {
 
   if (getLoginState()) {
     return (
-      <div>
+      <div className="my-2 mx-2">
         <Player></Player>
         <button
           onClick={() => {
