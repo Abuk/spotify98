@@ -127,9 +127,10 @@ export const playSong = (deviceId, contextId, mediaId, timeOffset) => {
     mediaId = [mediaId];
   }
   let data;
-  if (contextId !== null) {
+  console.log(contextId);
+  if (contextId !== null && typeof contextId !== "undefined") {
     data = {
-      context_uri: contextId,
+      context_uri: contextId.uri,
       position_ms: timeOffset,
     };
   } else {

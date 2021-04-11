@@ -73,7 +73,7 @@ const Player = () => {
   }, [currentDeviceId]);
 
   useEffect(() => {
-    //console.log(playbackState);
+    setPlayback(playbackState.is_playing);
   }, [playbackState]);
 
   useEffect(() => {
@@ -170,22 +170,13 @@ const Player = () => {
               {!playback ? (
                 <button
                   onClick={() => {
-                    console.log(playbackState.is_playing);
-                    if (currentDeviceId !== deviceId) {
-                      playSong(
-                        currentDeviceId,
-                        playbackState.context.uri,
-                        playbackState.item.uri.uri,
-                        playbackState.progress_ms
-                      );
-                    } else {
-                      playSong(
-                        deviceId,
-                        playbackState.context,
-                        playbackState.item.uri,
-                        playbackState.progress_ms
-                      );
-                    }
+                    playSong(
+                      currentDeviceId,
+                      playbackState.context,
+                      playbackState.item.uri,
+                      playbackState.progress_ms
+                    );
+
                     if (!playback) setPlayback(true);
                   }}
                 >
