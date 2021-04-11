@@ -8,6 +8,10 @@ code {
     monospace;
 }
 
+body {
+  background-color: #008080;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

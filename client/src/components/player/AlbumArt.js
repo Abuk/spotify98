@@ -4,8 +4,8 @@ const AlbumArt = (props) => {
   // console.log(props);
   return (
     <div className="flex">
-      <div className="window w-32 mb-2 mr-2">
-        <div className="window-body w-auto">
+      <div className="window w-16 mb-2 mr-2">
+        <div className="w-auto">
           <img src={props.src} alt={props.title}></img>
         </div>
       </div>

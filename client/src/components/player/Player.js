@@ -152,53 +152,64 @@ const Player = () => {
   }, []);
 
   return (
-    <div className="window w-96">
-      <div className="title-bar text-white">player pls</div>
+    <div className="window w-full">
       <div className="window-body">
-        <AlbumArt
-          src={playbackState.item.album.images[0].url}
-          alt={playbackState.item.album.name}
-          trackName={playbackState.item.name}
-          authors={_.compact(_.map(playbackState.item.artists, "name")).join(
-            ", "
-          )}
-        ></AlbumArt>
-        <button
-          onClick={() => {
-            if (currentDeviceId !== deviceId) {
-              playSong(
-                currentDeviceId,
-                null,
-                playbackState.item.uri,
-                playbackState.progress_ms
-              );
-            } else {
-              playSong(
-                deviceId,
-                null,
-                playbackState.item.uri,
-                playbackState.progress_ms
-              );
-            }
-            //console.log(playbackState);
-            if (!playback) setPlayback(true);
-          }}
-        >
-          play
-        </button>
-        <button
-          onClick={() => {
-            pause(currentDeviceId);
-            setPlayback(false);
-          }}
-        >
-          pause
-        </button>
-        <div>
-          <Time
-            progress={playbackState.progress_ms}
-            duration={playbackState.item.duration_ms}
-          ></Time>
+        <div className="grid grid-cols-3">
+          <div>
+            <AlbumArt
+              src={playbackState.item.album.images[0].url}
+              alt={playbackState.item.album.name}
+              trackName={playbackState.item.name}
+              authors={_.compact(
+                _.map(playbackState.item.artists, "name")
+              ).join(", ")}
+            ></AlbumArt>
+          </div>
+          <div className="min-w-96 flex flex-col items-stretch">
+            <div className="my-auto self-center">
+              {!playback ? (
+                <button
+                  onClick={() => {
+                    console.log(playbackState.is_playing);
+                    if (currentDeviceId !== deviceId) {
+                      playSong(
+                        currentDeviceId,
+                        playbackState.context.uri,
+                        playbackState.item.uri.uri,
+                        playbackState.progress_ms
+                      );
+                    } else {
+                      playSong(
+                        deviceId,
+                        playbackState.context,
+                        playbackState.item.uri,
+                        playbackState.progress_ms
+                      );
+                    }
+                    if (!playback) setPlayback(true);
+                  }}
+                >
+                  play
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    pause(currentDeviceId);
+                    setPlayback(false);
+                  }}
+                >
+                  pause
+                </button>
+              )}
+            </div>
+            <div className="my-auto">
+              <Time
+                progress={playbackState.progress_ms}
+                duration={playbackState.item.duration_ms}
+              ></Time>
+            </div>
+          </div>
+          <div>content bro</div>
         </div>
       </div>
     </div>
