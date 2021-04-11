@@ -73,7 +73,7 @@ const Player = () => {
   }, [currentDeviceId]);
 
   useEffect(() => {
-    console.log(playbackState);
+    //console.log(playbackState);
   }, [playbackState]);
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const Player = () => {
               });
             });
           }
-          console.log(state);
+          //console.log(state);
         });
 
         // Ready
@@ -180,7 +180,7 @@ const Player = () => {
                 playbackState.progress_ms
               );
             }
-            console.log(playbackState);
+            //console.log(playbackState);
             if (!playback) setPlayback(true);
           }}
         >

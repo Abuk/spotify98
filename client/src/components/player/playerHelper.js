@@ -303,3 +303,23 @@ export const fetchRecentlyPlayed = async () => {
     }
   });
 };
+
+export const seekTrack = (pos) => {
+  axios
+    .put(
+      `https://api.spotify.com/v1/me/player/seek?position_ms=${pos}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("access_token")}`,
+        },
+      }
+    )
+    .then((res) => {})
+    .catch((error) => {
+      console.log(error);
+      return false;
+    });
+  return true;
+};

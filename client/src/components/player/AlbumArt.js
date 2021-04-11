@@ -1,7 +1,7 @@
 import "98.css";
 
 const AlbumArt = (props) => {
-  console.log(props);
+  // console.log(props);
   return (
     <div className="flex">
       <div className="window w-32 mb-2 mr-2">
