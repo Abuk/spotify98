@@ -1,4 +1,7 @@
-body {
-  font-family: Levi Windows, serif;
-  color: #0004;
+.h-custom {
+  height: calc(100vh - 1rem) !important;
+}
+
+.w-custom {
+  width: calc(100vw - 1rem) !important;
 }
