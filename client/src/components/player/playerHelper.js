@@ -343,3 +343,27 @@ export const changeVolume = (val) => {
     });
   return true;
 };
+
+export const switchDevice = (id) => {
+  axios
+    .put(
+      `https://api.spotify.com/v1/me/player`,
+      JSON.stringify({
+        device_ids: [id],
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("access_token")}`,
+        },
+      }
+    )
+    .then((res) => {
+      if (res.status === 204) return true;
+    })
+    .catch((error) => {
+      console.log(error);
+      return false;
+    });
+  return true;
+};

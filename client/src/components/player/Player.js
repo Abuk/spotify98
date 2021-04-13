@@ -121,6 +121,7 @@ const Player = () => {
 
         // Playback status updates
         player.addListener("player_state_changed", (state) => {
+          console.log(state);
           if (isMounted) {
             fetchCurrentDevice().then((res) => {
               res.devices.forEach((device) => {

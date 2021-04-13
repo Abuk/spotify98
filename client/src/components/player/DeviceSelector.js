@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchCurrentDevice } from "./playerHelper";
+import { fetchCurrentDevice, switchDevice } from "./playerHelper";
 
 const DeviceSelector = (props) => {
   const [currDevice, setCurrDevice] = useState(props.currDevice);
@@ -11,6 +11,7 @@ const DeviceSelector = (props) => {
   };
   const changeDevice = (event) => {
     setCurrDevice(event.currentTarget.value);
+    switchDevice(event.currentTarget.value);
   };
   const fetchDevices = () => {
     fetchCurrentDevice().then((res) => {
@@ -32,6 +33,7 @@ const DeviceSelector = (props) => {
       className="max-w-auto text-wrap"
       onChange={changeDevice}
       onClick={fetchDevices}
+      value={typeof currDevice !== "undefined" ? currDevice.id : ""}
     >
       {
         /* {typeof devices !== "undefined"
@@ -45,7 +47,7 @@ const DeviceSelector = (props) => {
               className="text-center"
               key={index}
               value={device[1].id}
-              selected={device[1].is_active}
+              //selected={device[1].is_active}
             >
               {device[1].name}
             </option>
