@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { seekTrack } from "./playerHelper";
+//import "ProgressBar.css";
 
 const calcToMin = (time) => {
   var minutes = Math.floor(time / 60000);
@@ -39,7 +40,7 @@ const ProgressBar = (props) => {
         min={0}
         max={songLength}
         value={timeElapsed}
-        step="1000"
+        step="10"
         onInput={userClicked}
       />
       <label htmlFor="seekbar">{calcToMin(songLength)}</label>

@@ -12,17 +12,19 @@ import {
   fetchLastTrack,
 } from "./playerHelper";
 import Time from "./Time";
+import VolumeBar from "./VolumeBar";
+import DeviceSelector from "./DeviceSelector";
 import "98.css";
 
 const Player = () => {
   const [playback, setPlayback] = useState(false);
   const [playbackState, setPlaybackState] = useState(playbackStateSkeleton);
-  const [deviceId, setDeviceId] = useState("");
-  const [currentDeviceId, setCurrentDeviceId] = useState("");
+  const [device, setDevice] = useState(undefined);
+  const [currentDevice, setCurrentDevice] = useState(undefined);
   const playbackRef = React.useRef(playback);
   const playbackStateRef = React.useRef(playbackState);
-  const deviceIdStateRef = React.useRef(deviceId);
-  const currentDeviceIdStateRef = React.useRef(currentDeviceId);
+  const deviceStateRef = React.useRef(device);
+  const currentDeviceStateRef = React.useRef(currentDevice);
   let timeElapsed = React.useRef();
 
   const handlePlayback = (data) => {
@@ -33,44 +35,44 @@ const Player = () => {
     playbackStateRef.current = data;
     setPlaybackState(data);
   };
-  const handleDeviceId = (data) => {
-    deviceIdStateRef.current = data;
-    setDeviceId(data);
+  const handleDevice = (data) => {
+    deviceStateRef.current = data;
+    setDevice(data);
   };
-  const handleCurrentDeviceId = (data) => {
-    currentDeviceIdStateRef.current = data;
-    setCurrentDeviceId(data);
+  const handleCurrentDevice = (data) => {
+    currentDeviceStateRef.current = data;
+    setCurrentDevice(data);
   };
 
   useEffect(() => {
-    console.log("state deviceid changed: " + deviceId);
-    var hasBeenSetActive = false;
-    fetchCurrentDevice().then((res) => {
-      res.devices.forEach((device) => {
-        if (device.is_active) {
-          handleCurrentDeviceId(device.id);
-          hasBeenSetActive = true;
+    if (typeof device !== "undefined") {
+      console.log("state deviceid changed: " + device);
+      var hasBeenSetActive = false;
+      fetchCurrentDevice().then((res) => {
+        res.devices.forEach((dev) => {
+          if (dev.is_active) {
+            handleCurrentDevice(dev);
+            hasBeenSetActive = true;
+          }
+        });
+        if (!hasBeenSetActive) {
+          res.devices.forEach((dev) => {
+            if (device.id === dev.id) handleCurrentDevice(dev);
+          });
         }
       });
-    });
-    if (!hasBeenSetActive) {
-      handleCurrentDeviceId(deviceId);
+      fetchLastTrack().then((res) => {
+        handlePlaybackState(res);
+        if (res.actions.is_playing) {
+          handlePlayback(true);
+        }
+      });
     }
-    fetchLastTrack().then((res) => {
-      // var context_uri;
-      // if (res.context === null) context_uri = "";
-      // else context_uri = res.context.uri;
-      // console.log(res.progress_ms);
-      handlePlaybackState(res);
-      if (res.actions.is_playing) {
-        handlePlayback(true);
-      }
-    });
-  }, [deviceId]);
+  }, [device]);
 
   useEffect(() => {
-    console.log("state current deviceid changed: " + currentDeviceId);
-  }, [currentDeviceId]);
+    console.log("state current deviceid changed: " + currentDevice);
+  }, [currentDevice]);
 
   useEffect(() => {
     setPlayback(playbackState.is_playing);
@@ -123,7 +125,7 @@ const Player = () => {
             fetchCurrentDevice().then((res) => {
               res.devices.forEach((device) => {
                 if (device.is_active) {
-                  handleCurrentDeviceId(device.id);
+                  handleCurrentDevice(device);
                 }
               });
             });
@@ -135,7 +137,7 @@ const Player = () => {
         player.addListener("ready", ({ device_id }) => {
           console.log("Ready with Device ID", device_id);
           if (isMounted) {
-            handleDeviceId(device_id);
+            handleDevice(device_id);
           }
         });
 
@@ -155,7 +157,7 @@ const Player = () => {
     <div className="window w-full">
       <div className="window-body">
         <div className="grid grid-cols-3">
-          <div>
+          <div className="my-auto">
             <AlbumArt
               src={playbackState.item.album.images[0].url}
               alt={playbackState.item.album.name}
@@ -171,7 +173,9 @@ const Player = () => {
                 <button
                   onClick={() => {
                     playSong(
-                      currentDeviceId,
+                      typeof currentDevice === "undefined"
+                        ? device.id
+                        : currentDevice.id,
                       playbackState.context,
                       playbackState.item.uri,
                       playbackState.progress_ms
@@ -185,7 +189,7 @@ const Player = () => {
               ) : (
                 <button
                   onClick={() => {
-                    pause(currentDeviceId);
+                    pause(currentDevice.id);
                     setPlayback(false);
                   }}
                 >
@@ -200,7 +204,22 @@ const Player = () => {
               ></Time>
             </div>
           </div>
-          <div>content bro</div>
+          <div className="flex w-auto items-center justify-end mr-2">
+            <div className="mr-2">playlist</div>
+            <div className="mr-2">
+              <DeviceSelector currDevice={currentDevice}></DeviceSelector>
+            </div>
+            <div className="mr-2">
+              <VolumeBar
+                currVolume={
+                  typeof currentDevice === "undefined"
+                    ? 0
+                    : currentDevice.volume_percent
+                }
+              ></VolumeBar>
+            </div>
+            <div className="mr-2">expand</div>
+          </div>
         </div>
       </div>
     </div>
