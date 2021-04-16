@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchCurrentDevice, switchDevice } from "./playerHelper";
+import { fetchDevices, switchDevice } from "./playerHelper";
 
 const DeviceSelector = (props) => {
   const [currDevice, setCurrDevice] = useState(props.currDevice);
-  const [devices, setDevices] = useState(undefined);
+  const [devices, setDevices] = useState("");
+  const devicePoll = useRef();
   const devicesRef = useRef(devices);
   const handleDevices = (data) => {
     devicesRef.current = data;
@@ -13,8 +14,8 @@ const DeviceSelector = (props) => {
     setCurrDevice(event.currentTarget.value);
     switchDevice(event.currentTarget.value);
   };
-  const fetchDevices = () => {
-    fetchCurrentDevice().then((res) => {
+  const getDevices = () => {
+    fetchDevices().then((res) => {
       handleDevices(res.devices);
     });
   };
@@ -23,17 +24,21 @@ const DeviceSelector = (props) => {
   }, [props.currDevice]);
 
   useEffect(() => {
-    fetchCurrentDevice().then((res) => {
-      handleDevices(res.devices);
-    });
-  }, [currDevice]);
+    devicePoll.current = setInterval(() => {
+      fetchDevices().then((res) => {
+        handleDevices(res.devices);
+      });
+    }, 2000);
+
+    return clearInterval(devicePoll.current);
+  }, []);
 
   return (
     <select
       className="max-w-auto text-wrap"
       onChange={changeDevice}
-      onClick={fetchDevices}
-      value={typeof currDevice !== "undefined" ? currDevice.id : ""}
+      onClick={getDevices}
+      value={currDevice.id}
     >
       {
         /* {typeof devices !== "undefined"
@@ -41,7 +46,7 @@ const DeviceSelector = (props) => {
             <option value={device.id}></option>;
           })
         : ""} */
-        typeof devices !== "undefined" ? (
+        devices !== "" ? (
           Object.entries(devices).map((device, index) => (
             <option
               className="text-center"

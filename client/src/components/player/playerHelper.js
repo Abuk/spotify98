@@ -200,7 +200,7 @@ export const pause = () => {
     });
 };
 
-export const fetchCurrentDevice = async () => {
+export const fetchDevices = async () => {
   let promise = axios.get(`https://api.spotify.com/v1/me/player/devices`, {
     headers: {
       Authorization: `Bearer ${Cookies.get("access_token")}`,

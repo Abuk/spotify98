@@ -3,11 +3,10 @@ import AlbumArt from "./AlbumArt";
 import Cookies from "js-cookie";
 import React, { useEffect, useState } from "react";
 import {
-  playbackStateSkeleton,
   loadPlayer,
   playSong,
   pause,
-  fetchCurrentDevice,
+  fetchDevices,
   fetchCurrentPlayback,
   fetchLastTrack,
 } from "./playerHelper";
@@ -15,12 +14,16 @@ import Time from "./Time";
 import VolumeBar from "./VolumeBar";
 import DeviceSelector from "./DeviceSelector";
 import "98.css";
+const icons = process.env.PUBLIC_URL + "/icons/";
 
-const Player = () => {
-  const [playback, setPlayback] = useState(false);
-  const [playbackState, setPlaybackState] = useState(playbackStateSkeleton);
-  const [device, setDevice] = useState(undefined);
-  const [currentDevice, setCurrentDevice] = useState(undefined);
+const Player = ({ playback_state, current_device, device_id }) => {
+  // prop states
+  const [playbackState, setPlaybackState] = useState(playback_state);
+  const [currentDevice, setCurrentDevice] = useState(current_device);
+  // states
+  const [device, setDevice] = useState(device_id);
+  const [playback, setPlayback] = useState(playback_state.is_playing);
+
   const playbackRef = React.useRef(playback);
   const playbackStateRef = React.useRef(playbackState);
   const deviceStateRef = React.useRef(device);
@@ -48,7 +51,7 @@ const Player = () => {
     if (typeof device !== "undefined") {
       console.log("state deviceid changed: " + device);
       var hasBeenSetActive = false;
-      fetchCurrentDevice().then((res) => {
+      fetchDevices().then((res) => {
         res.devices.forEach((dev) => {
           if (dev.is_active) {
             handleCurrentDevice(dev);
@@ -92,67 +95,7 @@ const Player = () => {
     };
   }, [playback]);
 
-  useEffect(() => {
-    let isMounted = true;
-    loadPlayer().then(() => {
-      window.onSpotifyWebPlaybackSDKReady = () => {
-        const token = Cookies.get("access_token");
-        const player = new window.Spotify.Player({
-          name: "spotify98",
-          getOAuthToken: (cb) => {
-            cb(token);
-          },
-          volume: 0.5,
-        });
-
-        // Error handling
-        player.addListener("initialization_error", ({ message }) => {
-          console.error(message);
-        });
-        player.addListener("authentication_error", ({ message }) => {
-          console.error(message);
-        });
-        player.addListener("account_error", ({ message }) => {
-          console.error(message);
-        });
-        player.addListener("playback_error", ({ message }) => {
-          console.error(message);
-        });
-
-        // Playback status updates
-        player.addListener("player_state_changed", (state) => {
-          console.log(state);
-          if (isMounted) {
-            fetchCurrentDevice().then((res) => {
-              res.devices.forEach((device) => {
-                if (device.is_active) {
-                  handleCurrentDevice(device);
-                }
-              });
-            });
-          }
-          //console.log(state);
-        });
-
-        // Ready
-        player.addListener("ready", ({ device_id }) => {
-          console.log("Ready with Device ID", device_id);
-          if (isMounted) {
-            handleDevice(device_id);
-          }
-        });
-
-        // Not Ready
-        player.addListener("not_ready", ({ device_id }) => {
-          console.log("Device ID has gone offline", device_id);
-        });
-        console.log(player.connect());
-      };
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div className="window w-full">
@@ -169,7 +112,7 @@ const Player = () => {
             ></AlbumArt>
           </div>
           <div className="min-w-96 flex flex-col items-stretch">
-            <div className="my-auto self-center">
+            <div className="self-center">
               {!playback ? (
                 <button
                   onClick={() => {
@@ -185,7 +128,11 @@ const Player = () => {
                     if (!playback) setPlayback(true);
                   }}
                 >
-                  play
+                  <img
+                    className="w-auto mx-auto"
+                    src={`${icons}Play.svg`}
+                    alt="play"
+                  ></img>
                 </button>
               ) : (
                 <button
