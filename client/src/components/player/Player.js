@@ -1,34 +1,23 @@
 import _ from "lodash";
 import AlbumArt from "./AlbumArt";
-import Cookies from "js-cookie";
 import React, { useEffect, useState } from "react";
-import {
-  loadPlayer,
-  playSong,
-  pause,
-  fetchDevices,
-  fetchCurrentPlayback,
-  fetchLastTrack,
-} from "./playerHelper";
+import { playSong, pause, fetchLastTrack } from "./playerHelper";
 import Time from "./Time";
 import VolumeBar from "./VolumeBar";
 import DeviceSelector from "./DeviceSelector";
 import "98.css";
-const icons = process.env.PUBLIC_URL + "/icons/";
 
-const Player = ({ playback_state, current_device, device_id }) => {
+const Player = (props) => {
   // prop states
-  const [playbackState, setPlaybackState] = useState(playback_state);
-  const [currentDevice, setCurrentDevice] = useState(current_device);
+  const [playbackState, setPlaybackState] = useState(props.playback_state);
+  const [currentDevice, setCurrentDevice] = useState(props.current_device);
   // states
-  const [device, setDevice] = useState(device_id);
-  const [playback, setPlayback] = useState(playback_state.is_playing);
+  const [device, setDevice] = useState(props.this_device);
+  const [playback, setPlayback] = useState(props.playback_state.is_playing);
 
   const playbackRef = React.useRef(playback);
   const playbackStateRef = React.useRef(playbackState);
-  const deviceStateRef = React.useRef(device);
   const currentDeviceStateRef = React.useRef(currentDevice);
-  let timeElapsed = React.useRef();
 
   const handlePlayback = (data) => {
     playbackRef.current = data;
@@ -38,64 +27,27 @@ const Player = ({ playback_state, current_device, device_id }) => {
     playbackStateRef.current = data;
     setPlaybackState(data);
   };
-  const handleDevice = (data) => {
-    deviceStateRef.current = data;
-    setDevice(data);
-  };
   const handleCurrentDevice = (data) => {
     currentDeviceStateRef.current = data;
     setCurrentDevice(data);
   };
 
   useEffect(() => {
-    if (typeof device !== "undefined") {
-      console.log("state deviceid changed: " + device);
-      var hasBeenSetActive = false;
-      fetchDevices().then((res) => {
-        res.devices.forEach((dev) => {
-          if (dev.is_active) {
-            handleCurrentDevice(dev);
-            hasBeenSetActive = true;
-          }
-        });
-        if (!hasBeenSetActive) {
-          res.devices.forEach((dev) => {
-            if (device.id === dev.id) handleCurrentDevice(dev);
-          });
-        }
-      });
-      fetchLastTrack().then((res) => {
-        handlePlaybackState(res);
-        if (res.actions.is_playing) {
-          handlePlayback(true);
-        }
-      });
-    }
+    console.log("state deviceid changed: " + device);
+    fetchLastTrack().then((res) => {
+      handlePlaybackState(res);
+      if (res.actions.is_playing) {
+        handlePlayback(true);
+      }
+    });
   }, [device]);
 
   useEffect(() => {
-    console.log("state current deviceid changed: " + currentDevice);
-  }, [currentDevice]);
-
-  useEffect(() => {
-    setPlayback(playbackState.is_playing);
-  }, [playbackState]);
-
-  useEffect(() => {
-    clearInterval(timeElapsed.current);
-
-    timeElapsed.current = setInterval(() => {
-      fetchCurrentPlayback().then((res) => {
-        handlePlaybackState(res);
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timeElapsed.current);
-    };
-  }, [playback]);
-
-  useEffect(() => {}, []);
+    setPlaybackState(props.playback_state);
+    setPlayback(props.playback_state.is_playing);
+    setCurrentDevice(props.current_device);
+    setDevice(props.this_device);
+  }, [props]);
 
   return (
     <div className="window w-full">
@@ -128,11 +80,7 @@ const Player = ({ playback_state, current_device, device_id }) => {
                     if (!playback) setPlayback(true);
                   }}
                 >
-                  <img
-                    className="w-auto mx-auto"
-                    src={`${icons}Play.svg`}
-                    alt="play"
-                  ></img>
+                  play
                 </button>
               ) : (
                 <button

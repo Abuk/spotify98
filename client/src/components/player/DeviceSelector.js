@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { fetchDevices, switchDevice } from "./playerHelper";
 
 const DeviceSelector = (props) => {
-  const [currDevice, setCurrDevice] = useState(props.currDevice);
+  const [currDevice, setCurrDevice] = useState("");
   const [devices, setDevices] = useState("");
   const devicePoll = useRef();
   const devicesRef = useRef(devices);
@@ -20,20 +20,24 @@ const DeviceSelector = (props) => {
     });
   };
   useEffect(() => {
+    console.log(props.currDevice);
     setCurrDevice(props.currDevice);
+    fetchDevices().then((res) => {
+      handleDevices(res.devices);
+    });
   }, [props.currDevice]);
 
   useEffect(() => {
-    devicePoll.current = setInterval(() => {
-      fetchDevices().then((res) => {
-        handleDevices(res.devices);
-      });
-    }, 2000);
+    // devicePoll.current = setInterval(() => {
+    //   fetchDevices().then((res) => {
+    //     handleDevices(res.devices);
+    //   });
+    // }, 2000);
 
     return clearInterval(devicePoll.current);
   }, []);
 
-  return (
+  return devices !== "" ? (
     <select
       className="max-w-auto text-wrap"
       onChange={changeDevice}
@@ -62,6 +66,8 @@ const DeviceSelector = (props) => {
         )
       }
     </select>
+  ) : (
+    <div></div>
   );
 };
 
